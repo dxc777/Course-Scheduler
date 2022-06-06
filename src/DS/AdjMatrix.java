@@ -1,4 +1,4 @@
-package Application;
+package DS;
 
 import java.util.Arrays;
 

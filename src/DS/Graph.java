@@ -1,4 +1,4 @@
-package Application;
+package DS;
 
 public interface Graph
 {
