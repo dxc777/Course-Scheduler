@@ -9,23 +9,28 @@ import DS.AdjList;
 
 public class Parser
 {
-	private ArrayList<Course> courseNames;
+	private Scanner file;
 	
-	private HashMap<String, Integer> nameToIndex;
+	private ArrayList<Course> courses;
 	
-	private Queue<LinkedList<Course>> edgeToBeDetermined; 
+	private HashMap<String,Integer> nameToIndex;
+	
+	private Queue<LinkedList<String>> edges;
 	
 	private Graph g;
 	
-	private final char SEPERATOR = ',';
 	
-	public Parser(Scanner filePointer) 
+	public Parser(Scanner file) 
 	{
-		courseNames = new ArrayList<>();
+		courses = new ArrayList<Course>();
 		nameToIndex = new HashMap<>();
-		edgeToBeDetermined = new LinkedList<>();
+		edges = new LinkedList();
+		this.file = file;
+		parseFile();
 	}
 	
-	
-	
+	private void parseFile() 
+	{
+		
+	}
 }
