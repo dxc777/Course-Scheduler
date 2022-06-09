@@ -6,7 +6,7 @@ public record Course(String courseName, int units)
 	{
 		if(units < 0) 
 		{
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("The units of a course cannot be a negative number");
 		}
 	}
 	
