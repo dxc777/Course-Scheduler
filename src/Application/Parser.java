@@ -1,5 +1,6 @@
 package Application;
 import java.util.Scanner;
+import java.util.Stack;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -7,6 +8,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import DS.Graph;
 import DS.AdjList;
+import DS.AdjMatrix;
 
 public class Parser
 {
@@ -18,13 +20,15 @@ public class Parser
 	
 	private LinkedList<LinkedList<String>> edges;
 	
-	private Graph g;
+	private Graph graph;
 	
 	private final char[] illegalCharacters = {' ','\t'};
 	
 	private final String INCOMPLETE_DATA = "Error this line does not contain all the data that is required: ";
 	
 	private final String CANNOT_PARSE_NUMBER = "The units entered cannot be parsed. ";
+	
+	private final String CONCURRENT_FLAG = "-C";
 	
 	private final String SEPERATOR = ",";
 	
@@ -38,19 +42,43 @@ public class Parser
 	
 	private final byte COURSE_PREREQS_INDEX = 3;
 	
+	private final byte CONCURENT_WEIGHT = 2;
+	
+	private final byte NORMAL_WEIGHT = 1;
+	
 	public Parser(Scanner file) 
 	{
 		courses = new ArrayList<Course>();
 		nameToIndex = new HashMap<>();
-		edges = new LinkedList();
+		edges = new LinkedList<>();
 		this.file = file;
 		parseFile();
-		
-		System.out.println(courses);
-		System.out.println(nameToIndex);
-		System.out.println(edges);
+		buildGraph();
+		System.out.println(graph);
 	}
 	
+	private void buildGraph()
+	{
+		graph = new AdjMatrix(courses.size());
+		int i = 0;
+		for(LinkedList<String> vertexes : edges)
+		{
+			for(String e : vertexes) 
+			{
+				if(e.endsWith(CONCURRENT_FLAG)) 
+				{
+					e = e.substring(0, e.length()-2);
+					graph.addEdge(nameToIndex.get(e), i, CONCURENT_WEIGHT);
+				}
+				else 
+				{
+					graph.addEdge(nameToIndex.get(e), i,NORMAL_WEIGHT);
+				}
+			}
+			i++;
+		}
+	}
+
 	private void parseFile() 
 	{
 		while(file.hasNextLine()) 
@@ -91,7 +119,7 @@ public class Parser
 		}
 		
 		courses.add(new Course(courseName,courseUnits));
-		nameToIndex.put(courseName, courses.size() - 1);
+		nameToIndex.put(data[COURSE_IDENTIFIER_INDEX], courses.size() - 1);
 		edges.add(new LinkedList<>());
 		
 		for(int i = COURSE_PREREQS_INDEX; i < data.length; i++) 
@@ -106,12 +134,16 @@ public class Parser
 	private void formatData(String[] data)
 	{
 		data[COURSE_IDENTIFIER_INDEX] = stripAllIllegalCharacters(data[COURSE_IDENTIFIER_INDEX]);
+		if(data[COURSE_IDENTIFIER_INDEX] != null)
+			data[COURSE_IDENTIFIER_INDEX] = data[COURSE_IDENTIFIER_INDEX].toUpperCase();
+		
 		data[COURSE_NAME_INDEX] = data[COURSE_NAME_INDEX].strip();
 		
 		//Starting at units index and moving down all prereq list
 		for(int i = COURSE_PREREQS_INDEX; i < data.length; i++) 
 		{
 			data[i] = stripAllIllegalCharacters(data[i]);
+			if(data[i] != null) data[i] = data[i].toUpperCase();
 		}
 	}
 
@@ -137,5 +169,16 @@ public class Parser
 			}
 		}
 		return false;
+	}
+	
+	
+	public Graph getGraph() 
+	{
+		return graph;
+	}
+	
+	public ArrayList<Course> getCourseList()
+	{
+		return courses;
 	}
 }
