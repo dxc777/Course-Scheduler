@@ -1,14 +1,10 @@
 package Application;
 import java.util.Scanner;
-import java.util.Stack;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Queue;
-import DS.Graph;
-import DS.AdjList;
-import DS.AdjMatrix;
+import DS.*;
 
 public class Parser
 {
