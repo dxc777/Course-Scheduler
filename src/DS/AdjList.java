@@ -123,6 +123,23 @@ public class AdjList implements Graph
 		return adjVertexes;
 	}
 	
-	
+	public String toString() 
+	{
+		StringBuilder s = new StringBuilder();
+		for(int i = 0; i < graph.length; i++) 
+		{
+			s.append(i + ": ");
+			Edge curr = graph[i].next;
+			while(curr != null) 
+			{
+				s.append("[" + curr.adjVertex + "|" + curr.weight + "]");
+				s.append(" -> ");
+				curr = curr.next;
+			}
+			s.append("X\n");
+			
+		}
+		return s.toString();
+	}
 	
 }
