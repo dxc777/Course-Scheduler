@@ -88,5 +88,21 @@ public class AdjMatrix implements Graph
 		return adjVertexes;
 	}
 	
+	public String toString() 
+	{
+		StringBuilder s = new StringBuilder();
+		for(int i = 0; i < matrix.length; i++) 
+		{
+			s.append(i + ": ");
+			for(int j = 0; j < matrix[0].length; j++) 
+			{
+				if(matrix[i][j] != 0) 
+					s.append("[" + j + "|" + matrix[i][j] + "] -> ");
+			}
+			s.append("X\n");
+		}
+		return s.toString();
+	}
+	
 	
 }
