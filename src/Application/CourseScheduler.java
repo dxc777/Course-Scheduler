@@ -61,6 +61,13 @@ public class CourseScheduler
 		}
 	}
 	
+	public void override(int index) 
+	{
+		pick(index);
+		decrementPrereqCount(index);
+		//TODO: check of clean up is needed elsewhere ex) set prereq count to zero
+	}
+	
 	//picking the index of a vertex in the list
 	//decrement count
 	//add to schedule
