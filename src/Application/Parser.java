@@ -57,13 +57,15 @@ public class Parser
 	{
 		graph = new AdjMatrix(courses.size());
 		int i = 0;
-		for(LinkedList<String> vertexes : edges)
+		while(edges.isEmpty() == false)
 		{
-			for(String e : vertexes) 
+			LinkedList<String> vertexes = edges.removeFirst();
+			while(vertexes.isEmpty() == false) 
 			{
+				String e = vertexes.removeFirst();
 				if(e.endsWith(CONCURRENT_FLAG)) 
 				{
-					e = e.substring(0, e.length()-2);
+					e = e.substring(0, e.length() - CONCURRENT_FLAG.length());
 					graph.addEdge(nameToIndex.get(e), i, CONCURENT_WEIGHT);
 				}
 				else 
