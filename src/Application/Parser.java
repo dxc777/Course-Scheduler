@@ -23,9 +23,7 @@ public class Parser
 	private final String INCOMPLETE_DATA = "Error this line does not contain all the data that is required: ";
 	
 	private final String CANNOT_PARSE_NUMBER = "The units entered cannot be parsed. ";
-	
-	private final String CONCURRENT_FLAG = "-C";
-	
+		
 	private final String SEPERATOR = ",";
 	
 	private final byte MINIMUM_DATA_LENGTH = 3;
@@ -37,9 +35,7 @@ public class Parser
 	private final byte COURSE_UNITS_INDEX = 2;
 	
 	private final byte COURSE_PREREQS_INDEX = 3;
-	
-	private final byte CONCURENT_WEIGHT = 2;
-	
+		
 	private final byte NORMAL_WEIGHT = 1;
 	
 	public Parser(Scanner file) 
@@ -63,15 +59,7 @@ public class Parser
 			while(vertexes.isEmpty() == false) 
 			{
 				String e = vertexes.removeFirst();
-				if(e.endsWith(CONCURRENT_FLAG)) 
-				{
-					e = e.substring(0, e.length() - CONCURRENT_FLAG.length());
-					graph.addEdge(nameToIndex.get(e), i, CONCURENT_WEIGHT);
-				}
-				else 
-				{
-					graph.addEdge(nameToIndex.get(e), i,NORMAL_WEIGHT);
-				}
+				graph.addEdge(nameToIndex.get(e), i,NORMAL_WEIGHT);
 			}
 			i++;
 		}
