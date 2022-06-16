@@ -6,6 +6,18 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import DS.*;
 
+/**
+ * The sole purpose of this class is to process the file that contains 
+ * all the class information
+ * 
+ * each line follows this syntax -> [course id],[course name],[unit value of class],[list of all prerequisites],....
+ * the prerequisites list is comma separated
+ * 
+ * After the constructor is called an arraylist of courses and a graph containing the 
+ * prerequisite information will be available
+ * @author J
+ *
+ */
 public class Parser
 {
 	private Scanner file;
@@ -18,11 +30,15 @@ public class Parser
 	
 	private Graph graph;
 	
+	private final Integer DEFAULT_RETURN = Integer.MIN_VALUE;
+	
 	private final char[] illegalCharacters = {' ','\t'};
 	
 	private final String INCOMPLETE_DATA = "Error this line does not contain all the data that is required: ";
 	
 	private final String CANNOT_PARSE_NUMBER = "The units entered cannot be parsed. ";
+	
+	private final String UNDEFINED_IDENTIFIER = "An identifier is your file has no corresponding definition and is listed as a prerequisite for a class\n";
 		
 	private final String SEPERATOR = ",";
 	
@@ -49,7 +65,7 @@ public class Parser
 		System.out.println(graph);
 	}
 	
-	private void buildGraph()
+	private void buildGraph()  
 	{
 		graph = new AdjMatrix(courses.size());
 		int i = 0;
@@ -59,7 +75,14 @@ public class Parser
 			while(vertexes.isEmpty() == false) 
 			{
 				String e = vertexes.removeFirst();
-				graph.addEdge(nameToIndex.get(e), i,NORMAL_WEIGHT);
+				int vertex = nameToIndex.getOrDefault(e, DEFAULT_RETURN);
+				if(vertex == DEFAULT_RETURN) 
+				{
+					System.out.println(UNDEFINED_IDENTIFIER + "Identifier: " +e + 
+							"\n" + "Please define this identifier or remove it");
+					System.exit(0);
+				}
+				graph.addEdge(vertex, i,NORMAL_WEIGHT);
 			}
 			i++;
 		}
@@ -70,7 +93,7 @@ public class Parser
 		while(file.hasNextLine()) 
 		{
 			String line = file.nextLine();
-			if(line.isEmpty() || line.isBlank()) 
+			if(line.isBlank()) 
 			{
 				continue;
 			}
@@ -125,7 +148,6 @@ public class Parser
 		
 		data[COURSE_NAME_INDEX] = data[COURSE_NAME_INDEX].strip();
 		
-		//Starting at units index and moving down all prereq list
 		for(int i = COURSE_PREREQS_INDEX; i < data.length; i++) 
 		{
 			data[i] = stripAllIllegalCharacters(data[i]);
