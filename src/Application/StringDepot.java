@@ -22,7 +22,7 @@ public class StringDepot
 			+ "CSC121,Intro to programming,3\n"
 			+ "MAT281,Discrete Mathematics,4\n"
 			+ "CSC311,Data Strucutres,3,CSC121,Mat 281\n\n"
-			+ "Notice that the identifiers in the prerequisite list for CSC311 are not case sensitive and it doesnt not matter if there is extra spacing\n.";
+			+ "Notice that the identifiers in the prerequisite list for CSC311 are not case sensitive and it doesnt not matter if there is extra spacing.\n";
 
 	public static String filePrompt = "Enter the text file path: ";
 	
