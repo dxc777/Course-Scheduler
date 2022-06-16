@@ -9,35 +9,29 @@ import java.util.List;
 
 public class Main
 {
-	static final int MAX_UNITS = 15;
+	static Scanner kb = new Scanner(System.in);
+	
 	public static void main(String[] args)
 	{
-		args = new String[]{"Test.txt"};
-		Scanner filePointer = openFile(args);
-		Parser p = new Parser(filePointer);
+		System.out.println(StringDepot.intro);
+		System.out.println(StringDepot.filePrompt);
 		
-		ArrayList<Course> courses = p.getCourseList();
-		CourseScheduler cs = new CourseScheduler(p.getGraph(),p.getCourseList(),MAX_UNITS);
-		System.out.println(cs.currentState());
-		cs.pick(0);
-		System.out.println(cs.currentState());
-		cs.pick(0);
-		System.out.println(cs.currentState());
+		System.out.print(StringDepot.inputIndicator);
+		String filePath = kb.nextLine();
+		Scanner file = openFile(filePath);
+		
+		System.out.println(file);
+		System.out.println(kb);
 	}
 	
 
-	public static Scanner openFile(String[] args) 
+	public static Scanner openFile(String filePath) 
 	{
-		if(args.length == 0) 
-		{
-			System.out.println("No file has been provided for the program");
-			System.exit(0);
-		}
 		
 		Scanner s = null;
 		try 
 		{
-			s = new Scanner(new File(args[0]));
+			s = new Scanner(new File(filePath));
 		}
 		catch(FileNotFoundException e) 
 		{
