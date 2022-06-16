@@ -24,6 +24,12 @@ public class CourseScheduler
 	
 	private final String blockSeperator = "===========================================\n";
 	
+	public static int MAX_UNITS_REACHED = 2;
+	
+	public static int FREE_CLASSES_EMPTY = 1;
+	
+	public static int CAN_CONTINUE_PICKING = 0;
+	
 	public CourseScheduler(Graph graph, ArrayList<Course> courses, int maxUnits) 
 	{
 		this.graph = graph;
@@ -61,25 +67,57 @@ public class CourseScheduler
 		}
 	}
 	
-	public void override(int index) 
+	
+	//TODO: fix the can take same semester case
+	public int overridePrereqs(int vertex) throws MaxUnitsReachedException
 	{
-		pick(index);
-		decrementPrereqCount(index);
-		//TODO: check of clean up is needed elsewhere ex) set prereq count to zero
+		Course course = courses.get(vertex);
+		if(course.units() + currUnits > maxUnits) 
+		{
+			throw new MaxUnitsReachedException(maxUnits,currUnits,course.units());
+		}
+		
+		currUnits = course.units() + currUnits;
+		schedule.get(schedule.size() - 1).add(vertex);
+		overideDecrementPrereqCount(vertex);
+		
+		if(currUnits == maxUnits)
+		{
+			return MAX_UNITS_REACHED;
+		}
+		else if(freeClasses.size() == 0) 
+		{
+			return FREE_CLASSES_EMPTY;
+		}
+		else 
+		{
+			return CAN_CONTINUE_PICKING;
+		}
 	}
 	
+	//here you are passing in the actual vertex not the index 
+	private void overideDecrementPrereqCount(int vertex)
+	{
+		int[] neighbors = graph.neighbors(vertex);
+		for(int i = 0; i < neighbors.length; i++) 
+		{
+			prereqs[neighbors[i]]--;
+		}
+		prereqs[vertex] = -1;
+	}
+
+
 	//picking the index of a vertex in the list
 	//decrement count
 	//add to schedule
 	//remove from list
 	//update next free classes
-	public void pick(int index) 
+	public int pick(int index) throws MaxUnitsReachedException
 	{
 		Course course = courses.get(freeClasses.get(index));
 		if(course.units() + currUnits > maxUnits) 
 		{
-			System.out.println("Units");
-			System.exit(0);
+			throw new MaxUnitsReachedException(maxUnits,currUnits,course.units());
 		}
 		
 		currUnits = course.units() + currUnits;
@@ -87,9 +125,17 @@ public class CourseScheduler
 		decrementPrereqCount(index);
 		freeClasses.remove(index);
 		
-		if(currUnits == maxUnits || freeClasses.size() == 0)
+		if(currUnits == maxUnits)
 		{
-			endSemester();
+			return MAX_UNITS_REACHED;
+		}
+		else if(freeClasses.size() == 0) 
+		{
+			return FREE_CLASSES_EMPTY;
+		}
+		else 
+		{
+			return CAN_CONTINUE_PICKING;
 		}
 		
 	}
