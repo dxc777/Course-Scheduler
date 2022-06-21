@@ -24,12 +24,6 @@ public class CourseScheduler
 	
 	private final String blockSeperator = "===========================================\n";
 	
-	public static int MAX_UNITS_REACHED = 2;
-	
-	public static int FREE_CLASSES_EMPTY = 1;
-	
-	public static int CAN_CONTINUE_PICKING = 0;
-	
 	public CourseScheduler(Graph graph, ArrayList<Course> courses, int maxUnits) 
 	{
 		this.graph = graph;
@@ -69,12 +63,12 @@ public class CourseScheduler
 	
 	
 	//TODO: fix the can take same semester case
-	public int overridePrereqs(int vertex) throws MaxUnitsReachedException
+	public State overridePrereqs(int vertex) throws MaxUnitsReachedException
 	{
 		Course course = courses.get(vertex);
 		if(course.units() + currUnits > maxUnits) 
 		{
-			throw new MaxUnitsReachedException(maxUnits,currUnits,course.units());
+			return State.SEMESTER_UNITS_EXCEEDED;
 		}
 		
 		currUnits = course.units() + currUnits;
@@ -83,15 +77,15 @@ public class CourseScheduler
 		
 		if(currUnits == maxUnits)
 		{
-			return MAX_UNITS_REACHED;
+			return State.MAX_UNITS_REACHED;
 		}
 		else if(freeClasses.size() == 0) 
 		{
-			return FREE_CLASSES_EMPTY;
+			return State.FREE_CLASSES_EMPTY;
 		}
 		else 
 		{
-			return CAN_CONTINUE_PICKING;
+			return State.CAN_CONTINUE_PICKING;
 		}
 	}
 	
@@ -112,12 +106,12 @@ public class CourseScheduler
 	//add to schedule
 	//remove from list
 	//update next free classes
-	public int pick(int index) throws MaxUnitsReachedException
+	public State pick(int index) throws MaxUnitsReachedException
 	{
 		Course course = courses.get(freeClasses.get(index));
 		if(course.units() + currUnits > maxUnits) 
 		{
-			throw new MaxUnitsReachedException(maxUnits,currUnits,course.units());
+			return State.SEMESTER_UNITS_EXCEEDED;
 		}
 		
 		currUnits = course.units() + currUnits;
@@ -127,15 +121,15 @@ public class CourseScheduler
 		
 		if(currUnits == maxUnits)
 		{
-			return MAX_UNITS_REACHED;
+			return State.MAX_UNITS_REACHED;
 		}
 		else if(freeClasses.size() == 0) 
 		{
-			return FREE_CLASSES_EMPTY;
+			return State.FREE_CLASSES_EMPTY;
 		}
 		else 
 		{
-			return CAN_CONTINUE_PICKING;
+			return State.CAN_CONTINUE_PICKING;
 		}
 		
 	}
