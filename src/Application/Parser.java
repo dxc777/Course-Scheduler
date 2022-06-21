@@ -62,6 +62,7 @@ public class Parser
 		this.file = file;
 		parseFile();
 		buildGraph();
+		System.out.println(graph);
 	}
 	
 	private void buildGraph()  
