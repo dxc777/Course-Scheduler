@@ -13,22 +13,7 @@ public class Main
 	
 	public static void main(String[] args)
 	{
-		System.out.println(StringDepot.intro);
-		System.out.println(StringDepot.filePrompt);
 		
-		System.out.print(StringDepot.inputIndicator);
-		String filePath = kb.nextLine();
-		Scanner file = openFile(filePath);
-		
-		Parser p = new Parser(file);
-		
-		System.out.println(StringDepot.maxUnitsPrompt);
-		System.out.print(StringDepot.inputIndicator);
-		int maxUnits = (int) kb.nextDouble();
-		kb.nextLine();
-		
-		CourseScheduler scheduler = new CourseScheduler(p.getGraph(), p.getCourseList(), maxUnits);
-		System.out.println(scheduler.currentState());
 	}
 	
 	
