@@ -53,6 +53,7 @@ public class Parser
 		
 	private final byte NORMAL_WEIGHT = 1;
 	
+	//TODO: consider throwing an exception instead of simply printing out a message
 	public Parser(Scanner file) 
 	{
 		courses = new ArrayList<Course>();
