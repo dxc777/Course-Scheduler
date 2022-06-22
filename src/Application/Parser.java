@@ -9,15 +9,12 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 /**
- * The sole purpose of this class is to process the file that contains 
- * all the class information
+ * This class parses the input text file
+ * After the constructor is called it will have a graph and course list built
+ * The graph is in the way that all of the edges for a given vertex will be classes that require the
+ * vertex as a prerequisite
+ * Also courses[i] == vertex i in the graph
  * 
- * each line follows this syntax -> [course id],[course name],[unit value of class],[list of all prerequisites],....
- * the prerequisites list is comma separated
- * 
- * After the constructor is called an arraylist of courses and a graph containing the 
- * prerequisite information will be available
- * @author J
  *
  */
 public class Parser
@@ -26,11 +23,11 @@ public class Parser
 	
 	private ArrayList<Course> courses;
 	
+	private Graph graph;
+	
 	private HashMap<String,Integer> nameToIndex;
 	
 	private LinkedList<LinkedList<String>> edges;
-	
-	private Graph graph;
 	
 	private final Integer DEFAULT_RETURN = Integer.MIN_VALUE;
 	
