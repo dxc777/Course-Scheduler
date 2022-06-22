@@ -74,6 +74,7 @@ public class Parser
 	private void buildGraph()  
 	{
 		graph = new AdjMatrix(courses.size());
+		prereqGraph = new AdjList(courses.size());
 		int i = 0;
 		while(edges.isEmpty() == false)
 		{
@@ -97,10 +98,12 @@ public class Parser
 				if(isConcurrent) 
 				{
 					graph.addEdge(vertex, i, CONCURRENT_WEIGHT);
+					prereqGraph.addEdge(i, vertex, CONCURRENT_WEIGHT);
 				}
 				else 
 				{
 					graph.addEdge(vertex, i,NORMAL_WEIGHT);
+					prereqGraph.addEdge(i, vertex, NORMAL_WEIGHT);
 				}
 			}
 			i++;
@@ -202,6 +205,11 @@ public class Parser
 	public Graph getGraph() 
 	{
 		return graph;
+	}
+	
+	public Graph getPrereqGraph() 
+	{
+		return prereqGraph;
 	}
 	
 	public ArrayList<Course> getCourseList()
