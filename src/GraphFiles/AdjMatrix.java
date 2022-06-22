@@ -1,4 +1,4 @@
-package DS;
+package GraphFiles;
 
 import java.util.Arrays;
 

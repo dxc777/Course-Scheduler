@@ -20,9 +20,18 @@ public class Main
 		String filePath = kb.nextLine();
 		Scanner file = openFile(filePath);
 		
-		System.out.println(file);
-		System.out.println(kb);
+		Parser p = new Parser(file);
+		
+		System.out.println(StringDepot.maxUnitsPrompt);
+		System.out.print(StringDepot.inputIndicator);
+		int maxUnits = (int) kb.nextDouble();
+		kb.nextLine();
+		
+		CourseScheduler scheduler = new CourseScheduler(p.getGraph(), p.getCourseList(), maxUnits);
+		System.out.println(scheduler.currentState());
 	}
+	
+	
 	
 
 	public static Scanner openFile(String filePath) 

@@ -1,10 +1,12 @@
 package Application;
 import java.util.Scanner;
+
+import GraphFiles.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
-import DS.*;
 
 /**
  * The sole purpose of this class is to process the file that contains 
@@ -62,7 +64,6 @@ public class Parser
 		this.file = file;
 		parseFile();
 		buildGraph();
-		System.out.println(graph);
 	}
 	
 	private void buildGraph()  

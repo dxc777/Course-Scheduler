@@ -25,5 +25,12 @@ public class StringDepot
 			+ "Notice that the identifiers in the prerequisite list for CSC311 are not case sensitive and it doesnt not matter if there is extra spacing.\n";
 
 	public static String filePrompt = "Enter the text file path: ";
+
+	public static String maxUnitsPrompt = "Enter the max amount of units you want to take each semester";
+	
+	public static String choices = "1)Add a class to the current schedule.\n"
+			+ "2)End the current semester and move onto the next\n"
+			+ "3)Remove a class from the current semester"
+			+ "4)";
 	
 }

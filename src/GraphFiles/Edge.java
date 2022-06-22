@@ -1,4 +1,4 @@
-package DS;
+package GraphFiles;
 
 class Edge
 {

@@ -1,7 +1,11 @@
 package Application;
 import java.util.LinkedList;
+import java.util.List;
+
+import GraphFiles.*;
+
 import java.util.ArrayList;
-import DS.*;
+import java.util.Iterator;
 
 
 public class CourseScheduler
@@ -21,9 +25,7 @@ public class CourseScheduler
 	private ArrayList<Integer> freeClasses;
 	
 	private LinkedList<Integer> classesFreeNextSemester;
-	
-	private final String blockSeperator = "===========================================\n";
-	
+		
 	public CourseScheduler(Graph graph, ArrayList<Course> courses, int maxUnits) 
 	{
 		this.graph = graph;
@@ -63,7 +65,7 @@ public class CourseScheduler
 	
 	
 	//TODO: fix the can take same semester case
-	public State overridePrereqs(int vertex) throws MaxUnitsReachedException
+	public State overridePrereqs(int vertex)
 	{
 		Course course = courses.get(vertex);
 		if(course.units() + currUnits > maxUnits) 
@@ -89,7 +91,8 @@ public class CourseScheduler
 		}
 	}
 	
-	//here you are passing in the actual vertex not the index 
+	//Here you are passing in the actual vertex not the index 
+	//TODO determine what weight should be
 	private void overideDecrementPrereqCount(int vertex)
 	{
 		int[] neighbors = graph.neighbors(vertex);
@@ -106,7 +109,7 @@ public class CourseScheduler
 	//add to schedule
 	//remove from list
 	//update next free classes
-	public State pick(int index) throws MaxUnitsReachedException
+	public State pick(int index)
 	{
 		Course course = courses.get(freeClasses.get(index));
 		if(course.units() + currUnits > maxUnits) 
@@ -133,8 +136,6 @@ public class CourseScheduler
 		}
 		
 	}
-	
-	
 	
 	private void decrementPrereqCount(int index)
 	{
@@ -177,43 +178,55 @@ public class CourseScheduler
 		return classesFreeNextSemester;
 	}
 	
+	private final String blockSeperator = "===========================================\n";
+	
 	public String currentState() 
 	{
 		StringBuilder s = new StringBuilder();
+		
 		int semesterNum = 1;
-		int classNum = 1;
 		s.append(blockSeperator);
 		s.append("The current shcedule that has been built:\n");
 		for(ArrayList<Integer> indexes : schedule) 
 		{
 			s.append("Semester #" + semesterNum + "\n");
-			for(Integer i : indexes) 
+			if(indexes.isEmpty()) 
 			{
-				s.append(classNum + ") " + courses.get(i) + "\n");
-				classNum++;
+				s.append("<EMPTY>\n");
+			}
+			else 
+			{
+				s.append(getNumberedList(indexes));
 			}
 			semesterNum++;
 		}
+		
 		s.append(blockSeperator);
 		s.append("Classes that are free to pick:\n");
-		
-		classNum = 1;
-		for(Integer i : freeClasses) 
-		{
-			s.append(classNum + ") " + courses.get(i) + "\n");
-			classNum++;
-		}
-		
+		s.append(getNumberedList(freeClasses));
 		s.append(blockSeperator);
 		
 		s.append("Classes that are free to pick next semester\n");
-		classNum = 1;
-		for(Integer i : classesFreeNextSemester) 
-		{
-			s.append(classNum + ") " + courses.get(i)  + "\n" );
-			classNum++;
-		}
+		s.append(getNumberedList(classesFreeNextSemester));
 		s.append(blockSeperator);
+		return s.toString();
+	}
+	
+	//Meant to be called with a list of indexes that will 
+	//be used with the get() function from the courses arraylist
+	public String getNumberedList(List<Integer> indexes) 
+	{
+		StringBuilder s = new StringBuilder();
+		
+		int numberLabel = 1;
+		Iterator<Integer> iter = indexes.iterator();
+		while(iter.hasNext()) 
+		{
+			s.append(numberLabel + ") ");
+			s.append(courses.get(iter.next()) + "\n");
+			numberLabel++;
+		}
+		
 		return s.toString();
 	}
 	
