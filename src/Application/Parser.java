@@ -25,6 +25,8 @@ public class Parser
 	
 	private Graph graph;
 	
+	private Graph prereqGraph;
+	
 	private HashMap<String,Integer> nameToIndex;
 	
 	private LinkedList<LinkedList<String>> edges;
@@ -41,6 +43,8 @@ public class Parser
 		
 	private final String SEPERATOR = ",";
 	
+	private final String CONCURRENT_FLAG = "-C";
+	
 	private final byte MINIMUM_DATA_LENGTH = 3;
 	
 	private final byte COURSE_IDENTIFIER_INDEX = 0;
@@ -51,7 +55,10 @@ public class Parser
 	
 	private final byte COURSE_PREREQS_INDEX = 3;
 		
-	private final byte NORMAL_WEIGHT = 1;
+	public final byte NORMAL_WEIGHT = 1;
+	
+	public final byte CONCURRENT_WEIGHT = 2;
+
 	
 	//TODO: consider throwing an exception instead of simply printing out a message
 	public Parser(Scanner file) 
@@ -73,15 +80,28 @@ public class Parser
 			LinkedList<String> vertexes = edges.removeFirst();
 			while(vertexes.isEmpty() == false) 
 			{
-				String e = vertexes.removeFirst();
-				int vertex = nameToIndex.getOrDefault(e, DEFAULT_RETURN);
+				String course = vertexes.removeFirst();
+				boolean isConcurrent = false;
+				if(course.endsWith(CONCURRENT_FLAG)) 
+				{
+					isConcurrent = true;
+					course = course.substring(0, course.length() - CONCURRENT_FLAG.length());
+				}
+				int vertex = nameToIndex.getOrDefault(course, DEFAULT_RETURN);
 				if(vertex == DEFAULT_RETURN) 
 				{
-					System.out.println(UNDEFINED_IDENTIFIER + "Identifier: " +e + 
+					System.out.println(UNDEFINED_IDENTIFIER + "Identifier: " + course + 
 							"\n" + "Please define this identifier or remove it");
 					System.exit(0);
 				}
-				graph.addEdge(vertex, i,NORMAL_WEIGHT);
+				if(isConcurrent) 
+				{
+					graph.addEdge(vertex, i, CONCURRENT_WEIGHT);
+				}
+				else 
+				{
+					graph.addEdge(vertex, i,NORMAL_WEIGHT);
+				}
 			}
 			i++;
 		}
