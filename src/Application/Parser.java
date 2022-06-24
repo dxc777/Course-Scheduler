@@ -73,7 +73,7 @@ public class Parser
 	
 	private void buildGraph()  
 	{
-		graph = new AdjMatrix(courses.size());
+		graph = new AdjList(courses.size());
 		prereqGraph = new AdjList(courses.size());
 		int i = 0;
 		while(edges.isEmpty() == false)
