@@ -103,6 +103,16 @@ public class AdjMatrix implements Graph
 		}
 		return s.toString();
 	}
+
+	@Override
+	public boolean hasNeighbors(int vertex)
+	{
+		for(int edge : matrix[vertex]) 
+		{
+			if(edge != 0) return true;
+		}
+		return false;
+	}
 	
 	
 }

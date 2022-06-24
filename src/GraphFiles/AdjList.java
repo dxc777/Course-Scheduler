@@ -141,5 +141,11 @@ public class AdjList implements Graph
 		}
 		return s.toString();
 	}
+
+	@Override
+	public boolean hasNeighbors(int vertex)
+	{
+		return graph[vertex].next != null;
+	}
 	
 }

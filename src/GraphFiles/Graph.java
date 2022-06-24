@@ -19,4 +19,6 @@ public interface Graph
 	public void fillValues(int value);
 	
 	public int[] neighbors(int vertex);
+	
+	public boolean hasNeighbors(int vertex);
 }
