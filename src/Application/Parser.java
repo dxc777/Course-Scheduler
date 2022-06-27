@@ -23,9 +23,9 @@ public class Parser
 	
 	private ArrayList<Course> courses;
 	
-	private Graph graph;
-	
 	private Graph prereqGraph;
+	
+	private Graph requirementGraph;
 	
 	private HashMap<String,Integer> nameToIndex;
 	
@@ -73,8 +73,8 @@ public class Parser
 	
 	private void buildGraph()  
 	{
-		graph = new AdjList(courses.size());
 		prereqGraph = new AdjList(courses.size());
+		requirementGraph = new AdjList(courses.size());
 		int i = 0;
 		while(edges.isEmpty() == false)
 		{
@@ -97,13 +97,13 @@ public class Parser
 				}
 				if(isConcurrent) 
 				{
-					graph.addEdge(vertex, i, CONCURRENT_WEIGHT);
-					prereqGraph.addEdge(i, vertex, CONCURRENT_WEIGHT);
+					prereqGraph.addEdge(vertex, i, CONCURRENT_WEIGHT);
+					requirementGraph.addEdge(i, vertex, CONCURRENT_WEIGHT);
 				}
 				else 
 				{
-					graph.addEdge(vertex, i,NORMAL_WEIGHT);
-					prereqGraph.addEdge(i, vertex, NORMAL_WEIGHT);
+					prereqGraph.addEdge(vertex, i,NORMAL_WEIGHT);
+					requirementGraph.addEdge(i, vertex, NORMAL_WEIGHT);
 				}
 			}
 			i++;
@@ -202,14 +202,14 @@ public class Parser
 	}
 	
 	
-	public Graph getGraph() 
-	{
-		return graph;
-	}
-	
 	public Graph getPrereqGraph() 
 	{
 		return prereqGraph;
+	}
+	
+	public Graph getRequirementGraph() 
+	{
+		return requirementGraph;
 	}
 	
 	public ArrayList<Course> getCourseList()
