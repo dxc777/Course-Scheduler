@@ -4,17 +4,30 @@ import java.util.ArrayList;
 
 public class Semester
 {
-	private ArrayList<Integer> courseLoad;//course load will hold the vertex # 
-	
-	private final ArrayList<Course> courseList;
-	
-	private int totalSemesterUnits;
-	
-	public Semester(ArrayList<Course> courseList) 
+	private int unitTotal;
+
+	private ArrayList<Integer> courseLoad;
+
+	public Semester() 
 	{
+		this(0);
+	}
+
+	public Semester(int unitTotal)
+	{
+		super();
+		this.unitTotal = unitTotal;
 		this.courseLoad = new ArrayList<>();
-		this.totalSemesterUnits = 0;
-		this.courseList = courseList; //using a reference to already built list
+	}
+	
+	public int getUnitTotal()
+	{
+		return unitTotal;
+	}
+
+	public void setUnitTotal(int unitTotal)
+	{
+		this.unitTotal = unitTotal;
 	}
 
 	public ArrayList<Integer> getCourseLoad()
@@ -22,20 +35,9 @@ public class Semester
 		return courseLoad;
 	}
 
-	public int getTotalSemesterUnits()
+	public void setCourseLoad(ArrayList<Integer> courseLoad)
 	{
-		return totalSemesterUnits;
+		this.courseLoad = courseLoad;
 	}
-
-	public String toString() 
-	{
-		StringBuilder s = new StringBuilder();
-		for(int i : courseLoad) 
-		{
-			s.append(courseList.get(i) + "\n");
-		}
-		return new String(s);
-	}
-	
 	
 }
