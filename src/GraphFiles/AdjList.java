@@ -1,5 +1,6 @@
 package GraphFiles;
 
+
 public class AdjList implements Graph
 {
 	private Edge[] graph;
@@ -21,10 +22,10 @@ public class AdjList implements Graph
 		}
 	}
 	
-	private Edge getEdgeBefore(int vertex) 
+	private Edge getEdgeBefore(int vertex, int adjVertex) 
 	{
 		Edge curr = graph[vertex];
-		while(curr.next != null && curr.next.adjVertex < vertex) 
+		while(curr.next != null && adjVertex > curr.next.adjVertex ) 
 		{
 			curr = curr.next;
 		}
@@ -41,7 +42,7 @@ public class AdjList implements Graph
 	public void addEdge(int vertex, int adjVertex, int weight)
 	{
 		if(weight == 0) return;
-		Edge edgeBefore = getEdgeBefore(vertex);
+		Edge edgeBefore = getEdgeBefore(vertex,adjVertex);
 		if(edgeBefore.next != null && edgeBefore.next.adjVertex == adjVertex) 
 		{
 			edgeBefore.next.weight = weight;
@@ -55,7 +56,7 @@ public class AdjList implements Graph
 	@Override
 	public void removeEdge(int vertex, int adjVertex)
 	{
-		Edge edgeBefore = getEdgeBefore(vertex);
+		Edge edgeBefore = getEdgeBefore(vertex,adjVertex);
 		if(edgeBefore.next != null && edgeBefore.next.adjVertex == adjVertex) 
 		{
 			edgeBefore.next = edgeBefore.next.next;
@@ -65,14 +66,14 @@ public class AdjList implements Graph
 	@Override
 	public boolean hasEdge(int vertex, int adjVertex)
 	{
-		Edge edgeBefore = getEdgeBefore(vertex);
+		Edge edgeBefore = getEdgeBefore(vertex,adjVertex);
 		return edgeBefore != null && edgeBefore.next.adjVertex == adjVertex;
 	}
 
 	@Override
 	public int weight(int vertex, int adjVertex)
 	{
-		Edge edgeBefore = getEdgeBefore(vertex);
+		Edge edgeBefore = getEdgeBefore(vertex,adjVertex);
 		if(edgeBefore.next == null || edgeBefore.next.adjVertex != adjVertex) 
 		{
 			return 0;
@@ -146,6 +147,11 @@ public class AdjList implements Graph
 	public boolean hasNeighbors(int vertex)
 	{
 		return graph[vertex].next != null;
+	}
+	
+	public Edge getHeadOfVertex(int vertex) 
+	{
+		return graph[vertex];
 	}
 	
 }

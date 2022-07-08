@@ -1,6 +1,6 @@
 package GraphFiles;
 
-class Edge
+public class Edge
 {
 	public int adjVertex;
 	
