@@ -23,9 +23,9 @@ public class Parser
 	
 	private ArrayList<Course> courses;
 	
-	private Graph prereqGraph;
+	private AdjList requiredByXGraph;
 	
-	private Graph requirementGraph;
+	private AdjList classPrereqGraph;
 	
 	private HashMap<String,Integer> nameToIndex;
 	
@@ -55,7 +55,7 @@ public class Parser
 	
 	private final byte COURSE_PREREQS_INDEX = 3;
 		
-	public final byte NORMAL_WEIGHT = 1;
+	public final byte UNCOMPLETED_WEIGHT = 1;
 	
 	public final byte CONCURRENT_WEIGHT = 2;
 
@@ -73,8 +73,8 @@ public class Parser
 	
 	private void buildGraph()  
 	{
-		prereqGraph = new AdjList(courses.size());
-		requirementGraph = new AdjList(courses.size());
+		requiredByXGraph = new AdjList(courses.size());
+		classPrereqGraph = new AdjList(courses.size());
 		int i = 0;
 		while(edges.isEmpty() == false)
 		{
@@ -97,13 +97,13 @@ public class Parser
 				}
 				if(isConcurrent) 
 				{
-					prereqGraph.addEdge(vertex, i, CONCURRENT_WEIGHT);
-					requirementGraph.addEdge(i, vertex, CONCURRENT_WEIGHT);
+					requiredByXGraph.addEdge(vertex, i, CONCURRENT_WEIGHT);
+					classPrereqGraph.addEdge(i, vertex, CONCURRENT_WEIGHT);
 				}
 				else 
 				{
-					prereqGraph.addEdge(vertex, i,NORMAL_WEIGHT);
-					requirementGraph.addEdge(i, vertex, NORMAL_WEIGHT);
+					requiredByXGraph.addEdge(vertex, i,UNCOMPLETED_WEIGHT);
+					classPrereqGraph.addEdge(i, vertex, UNCOMPLETED_WEIGHT);
 				}
 			}
 			i++;
@@ -202,14 +202,14 @@ public class Parser
 	}
 	
 	
-	public Graph getPrereqGraph() 
+	public AdjList getRequiredByGraph() 
 	{
-		return prereqGraph;
+		return requiredByXGraph;
 	}
 	
-	public Graph getRequirementGraph() 
+	public AdjList getClassPrereqGraph() 
 	{
-		return requirementGraph;
+		return classPrereqGraph;
 	}
 	
 	public ArrayList<Course> getCourseList()
