@@ -66,7 +66,7 @@ public class Scheduler
 			State courseState = courseState(i);
 			if(courseState == State.CONDITIONAL) 
 			{
-				addConditionalClass(i);
+				addConditionalClass(i,takeableClasses);
 			}
 			else if(courseState == State.ALL_PREREQ_DONE) 
 			{
@@ -82,7 +82,7 @@ public class Scheduler
 	 * conditional no longer exists need a solution to remove stale data
 	 * @param vertex
 	 */
-	private void addConditionalClass(int vertex) 
+	private void addConditionalClass(int vertex,LinkedList<FreeCourse> list) 
 	{
 		ArrayList<Integer> coreqs = new ArrayList<>();
 		Edge curr = classPrereqGraph.getHeadOfVertex(vertex).next;
@@ -94,7 +94,7 @@ public class Scheduler
 			}
 			curr = curr.next;
 		}
-		takeableClasses.add(new FreeCourse(State.CONDITIONAL,vertex,coreqs));
+		list.add(new FreeCourse(State.CONDITIONAL,vertex,coreqs));
 	}
 	
 	//TODO: temp fix very inefficient
@@ -110,7 +110,7 @@ public class Scheduler
 			if(course.isConditional()) 
 			{
 				ArrayList<Integer> coreqs = course.getCorequisites();
-				coreqs.remove(vertexTaken);
+				coreqs.remove(Integer.valueOf(vertexTaken));
 				if(coreqs.isEmpty()) 
 				{
 					removeList.add(i);
@@ -148,7 +148,6 @@ public class Scheduler
 		currSemester.getCourseLoad().add(vertex.getVertex());
 		currSemester.setUnitTotal(currSemester.getUnitTotal() + course.units());
 		
-		cleanUpStaleData(vertex.getVertex());
 		updateState(vertex.getVertex());
 		takeableClasses.remove(vertex);
 		
@@ -161,9 +160,40 @@ public class Scheduler
 			return State.UNIT_NOT_FULL;
 		}
 	}
+	
+	public void endSemester(int semester ) 
+	{		
+		ArrayList<Integer> currSemester = fullSchedule.get(fullSchedule.size() - 1).getCourseLoad();
+		for(int i = 0; i < currSemester.size(); i++) 
+		{
+			cleanUpStaleData(currSemester.get(i));
+		}
+		
+		while(freedClasses.isEmpty() == false) 
+		{
+			takeableClasses.add(freedClasses.removeFirst());
+		}
+
+		fullSchedule.add(new Semester());
+	}
+	
 	private void updateState(int vertex)
 	{
-		
+		Edge curr = requiredByXGraph.getHeadOfVertex(vertex).next;
+		while(curr != null) 
+		{
+			classPrereqGraph.addEdge(curr.adjVertex, vertex, COMPLETED_WEIGHT);
+			State courseState = courseState(curr.adjVertex);
+			if(courseState == State.CONDITIONAL) 
+			{
+				addConditionalClass(curr.adjVertex,freedClasses);
+			}
+			else if(courseState == State.ALL_PREREQ_DONE) 
+			{
+				freedClasses.add(new FreeCourse(State.ALL_PREREQ_DONE,curr.adjVertex,null));
+			}
+			curr = curr.next;
+		}
 	}
 
 	//O(nm)
@@ -222,6 +252,7 @@ public class Scheduler
 		for(int i = 0; i < fullSchedule.size(); i++) 
 		{
 			s.append("Semester #" + (i + 1));
+			s.append('\n');
 			ArrayList<Integer> courseLoad = fullSchedule.get(i).getCourseLoad();
 			translateList(s, courseLoad, courseList);
 		}
@@ -230,14 +261,14 @@ public class Scheduler
 	
 	public String getTakeableStr() 
 	{
-		return translateFreeCourse("Classes that can be added to your schedule now", takeableClasses);
+		return translateFreeCourse("Classes that can be added to your schedule now:", takeableClasses);
 	}
 
 	
 	
 	public String getFreedStr() 
 	{
-		return translateFreeCourse("Classes that are available next semester", freedClasses);
+		return translateFreeCourse("Classes that are available next semester:", freedClasses);
 	}
 	
 	private void translateList(StringBuilder s, List<Integer> vertexes, List<?> sourceList) 
@@ -247,6 +278,7 @@ public class Scheduler
 		while(it.hasNext()) 
 		{
 			s.append(i + ") " + sourceList.get(it.next()) + "\n");
+			i++;
 		}
 	}
 	
@@ -254,10 +286,16 @@ public class Scheduler
 	{
 		StringBuilder s = new StringBuilder();
 		s.append(header);
+		s.append('\n');
 		Iterator<FreeCourse> it = list.iterator();
+		int i = 1;
 		while(it.hasNext()) 
 		{
+			s.append(i);
+			s.append(')');
+			s.append(' ');
 			appendFreeCourse(s, it.next());
+			i++;
 		}
 		return s.toString();
 	}
