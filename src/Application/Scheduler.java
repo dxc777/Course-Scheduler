@@ -78,7 +78,7 @@ public class Scheduler
 	/**
 	 * If a class needs to be added and needs co-requisites as well then its vertex needs to be saved as well as all the
 	 * co-requisites it needs
-	 * Note: there is an issue when a conditional class is added as if the prerequisite is taken then that 
+	 * Note: there is an issue when a conditional class is added as if the co - requisite is taken then that 
 	 * conditional no longer exists need a solution to remove stale data
 	 * @param vertex
 	 */
@@ -98,6 +98,7 @@ public class Scheduler
 	}
 	
 	//TODO: temp fix very inefficient
+	//To be used in pick a class function
 	private void cleanUpStaleData(int vertexTaken) 
 	{
 		Iterator<FreeCourse> it = takeableClasses.iterator();
@@ -125,6 +126,61 @@ public class Scheduler
 		}
 	}
 	
+	//TODO: Add logic so that it moves linearly up or down not just one direction (in this case only up)
+	public State pickCourse(int listIndex) 
+	{
+		FreeCourse vertex = takeableClasses.get(listIndex);
+		Course course = courseList.get(vertex.getVertex());
+		Semester currSemester = fullSchedule.get(fullSchedule.size() - 1);
+		if(course.units() + currSemester.getUnitTotal() > maxUnits) 
+		{
+			return State.UNIT_EXCEEDED;
+		}
+		
+		if(vertex.isConditional()) 
+		{
+			if(containsCoReqs(currSemester,vertex) == false) 
+			{
+				return State.COREQ_NOT_PRESENT;
+			}
+		}
+		
+		currSemester.getCourseLoad().add(vertex.getVertex());
+		currSemester.setUnitTotal(currSemester.getUnitTotal() + course.units());
+		
+		cleanUpStaleData(vertex.getVertex());
+		updateState(vertex.getVertex());
+		takeableClasses.remove(vertex);
+		
+		if(currSemester.getUnitTotal() == maxUnits) 
+		{
+			return State.UNIT_MAX;
+		}
+		else 
+		{
+			return State.UNIT_NOT_FULL;
+		}
+	}
+	private void updateState(int vertex)
+	{
+		
+	}
+
+	//O(nm)
+	private boolean containsCoReqs(Semester currSemester, FreeCourse vertex)
+	{
+		ArrayList<Integer> currentClasses = currSemester.getCourseLoad();
+		int count = 0;
+		for(int i = 0; i < currentClasses.size(); i++) 
+		{
+			if(vertex.getCorequisites().contains(currentClasses.get(i)))
+			{
+				count++;
+			}
+		}
+		return count == vertex.getCorequisites().size();
+	}
+
 	/**
 	 * Given the vertex of a class this function will return if this class can be taken, cannot be taken,
 	 * or can be taken with certain co-requisite
