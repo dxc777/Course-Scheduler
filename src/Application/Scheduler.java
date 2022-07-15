@@ -155,6 +155,10 @@ public class Scheduler
 		{
 			return State.UNIT_MAX;
 		}
+		else if(takeableClasses.isEmpty()) 
+		{
+			return State.NO_CLASSES_LEFT;
+		}
 		else 
 		{
 			return State.UNIT_NOT_FULL;
