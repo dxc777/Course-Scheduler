@@ -7,12 +7,19 @@ import java.util.List;
 
 import GraphFiles.*;
 
+/**
+ * The scheduler class will handle the logic of when a class is available and 
+ * adding and removing classes to a schedule. It runs based on a modified version of Khan's algorithm for 
+ * topological sort. The main difference being that the user will chose what vertex is chosen from the queue
+ * and the array that would have the number of incoming edges is no replaced by a graph. I chose to use another graph
+ * instead of an array of integers as the graph can provide more information about a class and it prerequisites.
+ * And it also solved the problem of figuring out if a class with co requisites can be taken. However this does 
+ * change the time complexity for certain parts of the algorithm.
+ * @author J
+ *
+ */
 public class Scheduler
 {
-	/**
-	 * This is where each list will get the information from
-	 * The index of a certain course is used as a vertex
-	 */
 	private ArrayList<Course> courseList;
 	
 	private int maxUnits;
@@ -20,17 +27,28 @@ public class Scheduler
 	private ArrayList<Semester> fullSchedule;
 	
 	/**
-	 * Takeable classes are classes that can be added to the current semester 
+	 * Takeable classes are classes that have all prerequisites met or can be taken with
+	 * co requisites
 	 */
 	private LinkedList<FreeCourse> takeableClasses;
 	
 	/**
-	 * freed classes are classes that have had their prerequisite count decremented
+	 * FreedClasses is meant to hold classes whose prerequisites were all completed during a semester but cannot be taken
+	 * until the next semester. When a semester is ended then the free classes list is emptied
 	 */
 	private LinkedList<FreeCourse> freedClasses;
 	
+	/**
+	 * Required by X as in for vertex a each edge X requires a as a prerequisite.
+	 * This is the graph that would be used in a normal implementation of topological sort
+	 */
 	private AdjList requiredByXGraph;
 	
+	/**
+	 * For each vertex in this graph each edge is a prerequisite to that vertex.
+	 * The meaning of each edge weight is listed below. This graph would be the integer array that holds the incoming 
+	 * edges.
+	 */
 	private AdjList classPrereqGraph;
 	
 	private static final byte CONCURRENT_WEIGHT = 2;
@@ -39,6 +57,12 @@ public class Scheduler
 	
 	private static final byte COMPLETED_WEIGHT = 3;
 	
+	/**
+	 * The constructor takes the parser object that has been instantiated with a text file. From that it 
+	 * will pull all the information it needs.
+	 * @param parsedFile
+	 * @param maxUnits
+	 */
 	//TODO have input file has section for maxUnits
 	public Scheduler(Parser parsedFile, int maxUnits) 
 	{
@@ -57,7 +81,8 @@ public class Scheduler
 	
 	/**
 	 * This methods find classes that have no prerequisites or can be conditionally added. 
-	 * This method will be called only in the constructor
+	 * This method will be called only in the constructor. This is equivalent to finding vertexes that have 
+	 * had all incoming edges processed in Khans algorithm.
 	 */
 	private void initializeFreeList() 
 	{
@@ -97,6 +122,13 @@ public class Scheduler
 		list.add(new FreeCourse(State.CONDITIONAL,vertex,coreqs));
 	}
 	
+	/**
+	 * Classes that can be taken conccurently with other classes is optional and not required. So if a students decides
+	 * not to take a class without it corequisites and said class has all corequisites completed then 
+	 * it is just a class with all prereqs completed. However there is no way for freedClasses to tell that is has been completed
+	 * so it needs to check for that specific case.
+	 * @param vertexTaken
+	 */
 	//TODO: temp fix very inefficient
 	//To be used in pick a class function
 	private void cleanUpStaleData(int vertexTaken) 
@@ -126,6 +158,12 @@ public class Scheduler
 		}
 	}
 	
+	/**
+	 * Pick course is called when a student adds a course to their schedule and will handle the logic of adding it to the schedule 
+	 * and adding classes that can be taken to the freedlist
+	 * @param listIndex
+	 * @return
+	 */
 	//TODO: Add logic so that it moves linearly up or down not just one direction (in this case only up)
 	public State pickCourse(int listIndex) 
 	{
@@ -181,6 +219,11 @@ public class Scheduler
 		fullSchedule.add(new Semester());
 	}
 	
+	/**
+	 * Update state updates the edge weight of a vertex and if it cna be taken it will be added to the feedClasses list
+	 * 
+	 * @param vertex
+	 */
 	private void updateState(int vertex)
 	{
 		Edge curr = requiredByXGraph.getHeadOfVertex(vertex).next;
@@ -248,7 +291,7 @@ public class Scheduler
 		}
 	}
 	
-	//=============All methods below relate to creating strings that describe the state of the class
+	//=============All methods below relate to creating strings that describe the state of the class========
 	public String getScheduleStr() 
 	{
 		StringBuilder s = new StringBuilder();
