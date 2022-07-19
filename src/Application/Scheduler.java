@@ -1,6 +1,8 @@
 package Application;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,6 +23,12 @@ import GraphFiles.*;
 public class Scheduler
 {
 	private ArrayList<Course> courseList;
+	
+	/**
+	 * true = class completed 
+	 * false = class uncompleted
+	 */
+	private HashMap<Integer,Boolean> completedClasses;
 	
 	private int maxUnits;
 	
@@ -57,6 +65,10 @@ public class Scheduler
 	
 	private static final byte COMPLETED_WEIGHT = 3;
 	
+	private static final boolean COMPLETED = true;
+	
+	private static final boolean UNCOMPLETED = false;
+	
 	/**
 	 * The constructor takes the parser object that has been instantiated with a text file. From that it 
 	 * will pull all the information it needs.
@@ -74,9 +86,13 @@ public class Scheduler
 		fullSchedule = new ArrayList<>();
 		takeableClasses = new LinkedList<>();
 		freedClasses = new LinkedList<>();
+		completedClasses = new HashMap<>(courseList.size());
 		
 		initializeFreeList();
 		fullSchedule.add(new Semester());
+		
+		System.out.println(requiredByXGraph);
+		System.out.println(classPrereqGraph);
 	}
 	
 	/**
@@ -123,38 +139,34 @@ public class Scheduler
 	}
 	
 	/**
-	 * Classes that can be taken conccurently with other classes is optional and not required. So if a students decides
+	 * Classes that can be taken concurrently with other classes is optional and not required. So if a students decides
 	 * not to take a class without it corequisites and said class has all corequisites completed then 
 	 * it is just a class with all prereqs completed. However there is no way for freedClasses to tell that is has been completed
 	 * so it needs to check for that specific case.
 	 * @param vertexTaken
 	 */
-	//TODO: temp fix very inefficient
-	//To be used in pick a class function
-	private void cleanUpStaleData(int vertexTaken) 
+	private void cleanUpStaleData() 
 	{
-		Iterator<FreeCourse> it = takeableClasses.iterator();
-		LinkedList<Integer> removeList = new LinkedList<>();
-		int i = 0;
-		while(it.hasNext()) 
+		Iterator<FreeCourse> courseIter = takeableClasses.iterator();
+		while(courseIter.hasNext()) 
 		{
-			FreeCourse course = it.next();
+			FreeCourse course = courseIter.next();
 			if(course.isConditional()) 
 			{
-				ArrayList<Integer> coreqs = course.getCorequisites();
-				coreqs.remove(Integer.valueOf(vertexTaken));
-				if(coreqs.isEmpty()) 
+				Iterator<Integer> coreqIter = course.getCorequisites().iterator();
+				while(coreqIter.hasNext()) 
 				{
-					removeList.add(i);
+					if(completedClasses.getOrDefault(coreqIter.next(), UNCOMPLETED) == COMPLETED) 
+					{
+						coreqIter.remove();
+					}
 				}
 			}
-			i++;
-		}
-		
-		while(removeList.isEmpty() == false) 
-		{
-			int index = removeList.removeFirst();
-			takeableClasses.remove(index);
+			
+			if(course.getCorequisites().isEmpty()) 
+			{
+				courseIter.remove();
+			}
 		}
 	}
 	
@@ -184,6 +196,7 @@ public class Scheduler
 		}
 		
 		currSemester.getCourseLoad().add(vertex.getVertex());
+		completedClasses.put(vertex.getVertex(), true);
 		currSemester.setUnitTotal(currSemester.getUnitTotal() + course.units());
 		
 		updateState(vertex.getVertex());
@@ -203,13 +216,14 @@ public class Scheduler
 		}
 	}
 	
-	public void endSemester(int semester ) 
+	public void removeCourse(int semester, int vertex) 
+	{
+		
+	}
+	
+	public void endSemester(int semester) 
 	{		
-		ArrayList<Integer> currSemester = fullSchedule.get(fullSchedule.size() - 1).getCourseLoad();
-		for(int i = 0; i < currSemester.size(); i++) 
-		{
-			cleanUpStaleData(currSemester.get(i));
-		}
+		cleanUpStaleData();
 		
 		while(freedClasses.isEmpty() == false) 
 		{
