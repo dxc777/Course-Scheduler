@@ -28,7 +28,7 @@ public class Scheduler
 	 * true = class completed 
 	 * false = class uncompleted
 	 */
-	private HashMap<Integer,Boolean> completedClasses;
+	private HashMap<Integer,Integer> completedClasses;
 	
 	private int maxUnits;
 	
@@ -64,10 +64,8 @@ public class Scheduler
 	private static final byte UNCOMPLETED_WEIGHT = 1;
 	
 	private static final byte COMPLETED_WEIGHT = 3;
-	
-	private static final boolean COMPLETED = true;
-	
-	private static final boolean UNCOMPLETED = false;
+		
+	private static final byte UNCOMPLETED = -1;
 	
 	/**
 	 * The constructor takes the parser object that has been instantiated with a text file. From that it 
