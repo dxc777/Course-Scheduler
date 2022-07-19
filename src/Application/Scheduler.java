@@ -59,13 +59,13 @@ public class Scheduler
 	 */
 	private AdjList classPrereqGraph;
 	
-	private static final byte CONCURRENT_WEIGHT = 2;
+	private static final int CONCURRENT_WEIGHT = 2;
 	
-	private static final byte UNCOMPLETED_WEIGHT = 1;
+	private static final int UNCOMPLETED_WEIGHT = 1;
 	
-	private static final byte COMPLETED_WEIGHT = 3;
+	private static final int COMPLETED_WEIGHT = 3;
 		
-	private static final byte UNCOMPLETED = -1;
+	private static final int UNCOMPLETED = -1;
 	
 	/**
 	 * The constructor takes the parser object that has been instantiated with a text file. From that it 
@@ -154,7 +154,7 @@ public class Scheduler
 				Iterator<Integer> coreqIter = course.getCorequisites().iterator();
 				while(coreqIter.hasNext()) 
 				{
-					if(completedClasses.getOrDefault(coreqIter.next(), UNCOMPLETED) == COMPLETED) 
+					if(completedClasses.getOrDefault(coreqIter.next(), UNCOMPLETED) != UNCOMPLETED) 
 					{
 						coreqIter.remove();
 					}
