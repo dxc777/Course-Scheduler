@@ -23,7 +23,7 @@ import GraphFiles.*;
 public class Scheduler
 {
 	private ArrayList<Course> courseList;
-	
+		
 	/**
 	 * true = class completed 
 	 * false = class uncompleted
@@ -31,6 +31,8 @@ public class Scheduler
 	private HashMap<Integer,Integer> completedClasses;
 	
 	private int maxUnits;
+	
+	private int currSemester;
 	
 	private ArrayList<Semester> fullSchedule;
 	
@@ -159,11 +161,11 @@ public class Scheduler
 						coreqIter.remove();
 					}
 				}
-			}
-			
-			if(course.getCorequisites().isEmpty()) 
-			{
-				courseIter.remove();
+				
+				if(course.getCorequisites().isEmpty()) 
+				{
+					courseIter.remove();
+				}
 			}
 		}
 	}
