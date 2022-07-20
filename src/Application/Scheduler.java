@@ -83,6 +83,7 @@ public class Scheduler
 		classPrereqGraph = parsedFile.getClassPrereqGraph();
 		
 		this.maxUnits = maxUnits;
+		currSemester = 0;
 		fullSchedule = new ArrayList<>();
 		takeableClasses = new LinkedList<>();
 		freedClasses = new LinkedList<>();
@@ -177,7 +178,7 @@ public class Scheduler
 	 * @return
 	 */
 	//TODO: Add logic so that it moves linearly up or down not just one direction (in this case only up)
-	public State pickCourse(int listIndex) 
+	public State pickCourse(int semester, int listIndex) 
 	{
 		FreeCourse vertex = takeableClasses.get(listIndex);
 		Course course = courseList.get(vertex.getVertex());
@@ -196,7 +197,7 @@ public class Scheduler
 		}
 		
 		currSemester.getCourseLoad().add(vertex.getVertex());
-		completedClasses.put(vertex.getVertex(), true);
+		completedClasses.put(vertex.getVertex(), semester);
 		currSemester.setUnitTotal(currSemester.getUnitTotal() + course.units());
 		
 		updateState(vertex.getVertex());
