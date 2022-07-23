@@ -25,14 +25,16 @@ public class Scheduler
 	private ArrayList<Course> courseList;
 		
 	/**
-	 * true = class completed 
-	 * false = class uncompleted
+	 * true = class taken 
+	 * false = class not taken
 	 */
 	private HashMap<Integer,Integer> completedClasses;
 	
 	private int maxUnits;
 	
 	private int currSemester;
+	
+	private int coursesProcessed;
 	
 	private ArrayList<Semester> fullSchedule;
 	
@@ -44,7 +46,7 @@ public class Scheduler
 	
 	/**
 	 * FreedClasses is meant to hold classes whose prerequisites were all completed during a semester but cannot be taken
-	 * until the next semester. When a semester is ended then the free classes list is emptied
+	 * until the next semester. When a semester ends then the free classes list is emptied into takeable classes
 	 */
 	private LinkedList<FreeCourse> freedClasses;
 	
@@ -69,6 +71,8 @@ public class Scheduler
 		
 	private static final int UNCOMPLETED = -1;
 	
+	private static final int DEFAULT_SCHEDULE_LENGTH = 24;
+	
 	/**
 	 * The constructor takes the parser object that has been instantiated with a text file. From that it 
 	 * will pull all the information it needs.
@@ -90,10 +94,11 @@ public class Scheduler
 		completedClasses = new HashMap<>(courseList.size());
 		
 		initializeFreeList();
-		fullSchedule.add(new Semester());
+		for(int i = 0; i < DEFAULT_SCHEDULE_LENGTH; i++) 
+		{
+			fullSchedule.add(new Semester());
+		}
 		
-		System.out.println(requiredByXGraph);
-		System.out.println(classPrereqGraph);
 	}
 	
 	/**
@@ -178,32 +183,32 @@ public class Scheduler
 	 * @return
 	 */
 	//TODO: Add logic so that it moves linearly up or down not just one direction (in this case only up)
-	public State pickCourse(int semester, int listIndex) 
+	public State pickCourse(int listIndex) 
 	{
 		FreeCourse vertex = takeableClasses.get(listIndex);
 		Course course = courseList.get(vertex.getVertex());
-		Semester currSemester = fullSchedule.get(fullSchedule.size() - 1);
-		if(course.units() + currSemester.getUnitTotal() > maxUnits) 
+		Semester semesterData = fullSchedule.get(this.currSemester);
+		if(course.units() + semesterData.getUnitTotal() > maxUnits) 
 		{
 			return State.UNIT_EXCEEDED;
 		}
 		
 		if(vertex.isConditional()) 
 		{
-			if(containsCoReqs(currSemester,vertex) == false) 
+			if(containsCoReqs(vertex) == false) 
 			{
 				return State.COREQ_NOT_PRESENT;
 			}
 		}
 		
-		currSemester.getCourseLoad().add(vertex.getVertex());
-		completedClasses.put(vertex.getVertex(), semester);
-		currSemester.setUnitTotal(currSemester.getUnitTotal() + course.units());
-		
+		semesterData.getCourseLoad().add(vertex.getVertex());
+		completedClasses.put(vertex.getVertex(), this.currSemester);
+		semesterData.setUnitTotal(semesterData.getUnitTotal() + course.units());
+		coursesProcessed++;
 		updateState(vertex.getVertex());
 		takeableClasses.remove(vertex);
 		
-		if(currSemester.getUnitTotal() == maxUnits) 
+		if(semesterData.getUnitTotal() == maxUnits) 
 		{
 			return State.UNIT_MAX;
 		}
@@ -215,6 +220,7 @@ public class Scheduler
 		{
 			return State.UNIT_NOT_FULL;
 		}
+		
 	}
 	
 	public void removeCourse(int semester, int vertex) 
@@ -230,8 +236,6 @@ public class Scheduler
 		{
 			takeableClasses.add(freedClasses.removeFirst());
 		}
-
-		fullSchedule.add(new Semester());
 	}
 	
 	/**
@@ -258,19 +262,17 @@ public class Scheduler
 		}
 	}
 
-	//O(nm)
-	private boolean containsCoReqs(Semester currSemester, FreeCourse vertex)
+	private boolean containsCoReqs(FreeCourse vertex)
 	{
-		ArrayList<Integer> currentClasses = currSemester.getCourseLoad();
-		int count = 0;
-		for(int i = 0; i < currentClasses.size(); i++) 
+		ArrayList<Integer> coreqs = vertex.getCorequisites();
+		for(Integer course : coreqs) 
 		{
-			if(vertex.getCorequisites().contains(currentClasses.get(i)))
+			if(completedClasses.getOrDefault(course, UNCOMPLETED_WEIGHT) == UNCOMPLETED_WEIGHT) 
 			{
-				count++;
+				return false;
 			}
 		}
-		return count == vertex.getCorequisites().size();
+		return true;
 	}
 
 	/**
@@ -304,6 +306,12 @@ public class Scheduler
 		{
 			return State.ALL_PREREQ_DONE;
 		}
+	}
+	
+	
+	public boolean finshedPlanning() 
+	{
+		return courseList.size() == coursesProcessed;
 	}
 	
 	//=============All methods below relate to creating strings that describe the state of the class========
@@ -374,5 +382,33 @@ public class Scheduler
 					+ " in the same schedule:===\n");
 			translateList(s, course.getCorequisites(), courseList);
 		}
+	}
+	
+	public void moveUpSemester() 
+	{
+		if(currSemester >= fullSchedule.size() - 1) 
+		{
+			return;
+		}
+		currSemester++;
+	}
+	
+	public void moveDownSemester() 
+	{
+		if(currSemester <= 0) 
+		{
+			return;
+		}
+		currSemester--;
+	}
+	
+	public boolean moveToSemester(int semester) 
+	{
+		if(semester < 0 || semester >= fullSchedule.size()) 
+		{
+			return false;
+		}
+		currSemester = semester;
+		return true;
 	}
 }
