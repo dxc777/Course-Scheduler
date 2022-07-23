@@ -227,8 +227,8 @@ public class Scheduler
 	{
 		
 	}
-	
-	public void endSemester(int semester) 
+	//TODO add logic to handle case of when semester ends
+	public void endSemester() 
 	{		
 		cleanUpStaleData();
 		
@@ -382,24 +382,6 @@ public class Scheduler
 					+ " in the same schedule:===\n");
 			translateList(s, course.getCorequisites(), courseList);
 		}
-	}
-	
-	public void moveUpSemester() 
-	{
-		if(currSemester >= fullSchedule.size() - 1) 
-		{
-			return;
-		}
-		currSemester++;
-	}
-	
-	public void moveDownSemester() 
-	{
-		if(currSemester <= 0) 
-		{
-			return;
-		}
-		currSemester--;
 	}
 	
 	public boolean moveToSemester(int semester) 
